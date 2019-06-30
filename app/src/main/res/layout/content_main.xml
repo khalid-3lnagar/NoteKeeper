@@ -7,7 +7,7 @@
 		android:layout_height="match_parent"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior"
 		tools:showIn="@layout/activity_note"
-		tools:context=".presentation.features.note_screen.MainActivity">
+		tools:context=".presentation.features.note_screen.NoteActivity">
 	<Spinner
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"

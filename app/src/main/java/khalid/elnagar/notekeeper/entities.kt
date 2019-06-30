@@ -13,7 +13,7 @@ data class Note(
 data class Course(
     val courseId: String,
     val title: String,
-    val modules: List<Module>
+    var modules: List<Module>
 ) {
 
     var modulesCompletionStatus: BooleanArray
