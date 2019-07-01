@@ -6,8 +6,10 @@ import khalid.elnagar.notekeeper.Module
 import khalid.elnagar.notekeeper.Note
 
 typealias CoursesLiveData = LiveData<List<Course>>
+typealias NotesLiveData = LiveData<List<Note>>
 
 @Suppress("UNCHECKED_CAST")
+
 class InMemoryCoursesGetaway private constructor(
 
 ) {
@@ -15,18 +17,26 @@ class InMemoryCoursesGetaway private constructor(
     private val notes by lazy { mutableListOf<Note>().toMutableLiveData() }
 
     companion object {
-        val instance by lazy { InMemoryCoursesGetaway().apply { initializeCourses() } }
+        val instance by lazy {
+            InMemoryCoursesGetaway().apply {
+                initializeCourses()
+                initializeExampleNotes()
+            }
+        }
     }
 
     fun retrieveCourses() = courses as CoursesLiveData
 
+    fun retrieveNotes() = notes as NotesLiveData
 
-    //region Initialization code
+    private fun getCourse(courseTitle: String): Course? = courses.value?.filter { it.title == courseTitle }?.get(0)
+
+//region Initialization code
 
     //region initialize Courses
 
     private fun initializeCourses() {
-        ArrayList<Course>()
+        mutableListOf<Course>()
             .apply {
                 add(initializeCourse1())
                 add(initializeCourse2())
@@ -101,84 +111,122 @@ class InMemoryCoursesGetaway private constructor(
             .also { return Course("java_core", "Java Fundamentals: The Core Platform", it) }
 
     }
-    //endregion
-
-/*
-    fun initializeExampleNotes()  {
-        val dm = instance
-
-        var course = dm.getCourse("android_intents")
-        course.getModule("android_intents_m01").setComplete(true)
-        course.getModule("android_intents_m02").setComplete(true)
-        course.getModule("android_intents_m03").setComplete(true)
-        mNotes.add(
-            NoteInfo(
-                course, "Dynamic intent resolution",
-                "Wow, intents allow components to be resolved at runtime"
-            )
-        )
-        mNotes.add(
-            NoteInfo(
-                course, "Delegating intents",
-                "PendingIntents are powerful; they delegate much more than just a component invocation"
-            )
-        )
-
-        course = dm.getCourse("android_async")
-        course.getModule("android_async_m01").setComplete(true)
-        course.getModule("android_async_m02").setComplete(true)
-        mNotes.add(
-            NoteInfo(
-                course, "Service default threads",
-                "Did you know that by default an Android Service will tie up the UI thread?"
-            )
-        )
-        mNotes.add(
-            NoteInfo(
-                course, "Long running operations",
-                "Foreground Services can be tied to a notification icon"
-            )
-        )
-
-        course = dm.getCourse("java_lang")
-        course.getModule("java_lang_m01").setComplete(true)
-        course.getModule("java_lang_m02").setComplete(true)
-        course.getModule("java_lang_m03").setComplete(true)
-        course.getModule("java_lang_m04").setComplete(true)
-        course.getModule("java_lang_m05").setComplete(true)
-        course.getModule("java_lang_m06").setComplete(true)
-        course.getModule("java_lang_m07").setComplete(true)
-        mNotes.add(
-            NoteInfo(
-                course, "Parameters",
-                "Leverage variable-length parameter lists"
-            )
-        )
-        mNotes.add(
-            NoteInfo(
-                course, "Anonymous classes",
-                "Anonymous classes simplify implementing one-use types"
-            )
-        )
-
-        course = dm.getCourse("java_core")
-        course.getModule("java_core_m01").setComplete(true)
-        course.getModule("java_core_m02").setComplete(true)
-        course.getModule("java_core_m03").setComplete(true)
-        mNotes.add(
-            NoteInfo(
-                course, "Compiler options",
-                "The -jar option isn't compatible with with the -cp option"
-            )
-        )
-        mNotes.add(
-            NoteInfo(
-                course, "Serialization",
-                "Remember to include SerialVersionUID to assure version compatibility"
-            )
-        )
-    }*/
 
     //endregion
+
+    //region Initialize Notes
+    fun initializeExampleNotes() {
+
+        mutableListOf<Note>()
+            .apply {
+                addAll(initializeNotes1())
+                addAll(initializeNotes2())
+                addAll(initializeNotes3())
+                addAll(initializeNotes4())
+            }
+            .also { notes.postValue(it) }
+
+    }
+
+    private fun initializeNotes1(): List<Note> {
+
+        val course = getCourse("android_intents")!!
+            .apply {
+                getModule("android_intents_m03").isComplete = true
+                getModule("android_intents_m02").isComplete = true
+            }
+
+        mutableListOf(
+
+            Note(
+                "Dynamic intent resolution",
+                "Wow, intents allow components to be resolved at runtime",
+                course
+            ),
+            Note(
+                "Delegating intents",
+                "PendingIntents are powerful; they delegate much more than just a component invocation",
+                course
+            )
+
+        ).also { return it }
+    }
+
+    private fun initializeNotes2(): List<Note> {
+
+        val course = getCourse("android_async")!!
+            .apply {
+                getModule("android_async_m01").isComplete = true
+                getModule("android_async_m02").isComplete = true
+            }
+
+
+
+        mutableListOf(
+
+            Note(
+                "Service default threads",
+                "Did you know that by default an Android Service will tie up the UI thread?", course
+            ),
+            Note(
+                "Long running operations",
+                "Foreground Services can be tied to a notification icon", course
+            )
+        )
+            .also { return it }
+
+    }
+
+    private fun initializeNotes3(): List<Note> {
+        val course = getCourse("java_lang")!!
+
+        with(course) {
+            getModule("java_lang_m01").isComplete = true
+            getModule("java_lang_m02").isComplete = true
+            getModule("java_lang_m03").isComplete = true
+            getModule("java_lang_m04").isComplete = true
+            getModule("java_lang_m05").isComplete = true
+            getModule("java_lang_m06").isComplete = true
+            getModule("java_lang_m07").isComplete = true
+        }
+
+
+        mutableListOf(
+            Note(
+                "Parameters",
+                "Leverage variable-length parameter lists", course
+            ),
+            Note(
+                "Anonymous classes",
+                "Anonymous classes simplify implementing one-use types", course
+            )
+        )
+            .also { return it }
+
+    }
+
+    private fun initializeNotes4(): List<Note> {
+        val course = getCourse("java_core")!!
+            .apply {
+                getModule("java_core_m01").isComplete = true
+                getModule("java_core_m02").isComplete = true
+                getModule("java_core_m03").isComplete = true
+            }
+        mutableListOf(
+
+            Note(
+                "Compiler options",
+                "The -jar option isn't compatible with with the -cp option", course
+            ),
+            Note(
+                "Serialization",
+                "Remember to include SerialVersionUID to assure version compatibility", course
+            )
+
+        ).also { return it }
+    }
+    //endregion
+
+//endregion
 
 }
