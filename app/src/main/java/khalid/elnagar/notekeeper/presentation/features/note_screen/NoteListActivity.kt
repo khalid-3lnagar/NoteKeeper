@@ -4,8 +4,8 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -21,19 +21,23 @@ import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_note.view.*
 
+const val INTENT_EXTRA_NOTE = "0"
+
+enum class NoteScenario {
+
+    ADD_NOTE, EDIT_NOTE
+}
+
+//region View
 class NoteListActivity : AppCompatActivity() {
-    val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }
+
+    private val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-
-
-        }
+        fab.setOnClickListener { startNoteActivity(NoteScenario.ADD_NOTE) }
         initRecyclerView()
         model.retrieveAllNotes()
     }
@@ -41,13 +45,28 @@ class NoteListActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         with(rv_list_notes) {
             layoutManager = LinearLayoutManager(this@NoteListActivity)
-            adapter = NotesAdapter(model.notes, this@NoteListActivity)
+            adapter = NotesAdapter(model.notes, this@NoteListActivity, onItemClicked())
         }
+    }
 
+    private fun onItemClicked(): NotesAdapter.OnItemClicked {
+        return object : NotesAdapter.OnItemClicked {
+            override fun onClick(note: Note) {
+                startNoteActivity(NoteScenario.EDIT_NOTE)
+            }
+        }
+    }
+
+    private fun startNoteActivity(scenario: NoteScenario) {
+        Intent(this, NoteActivity::class.java)
+            .also { it.putExtra(INTENT_EXTRA_NOTE, scenario) }
+            .also(::startActivity)
 
     }
 
 }
+
+//endregion
 //region ViewModel
 
 class NotesViewModel(
@@ -58,16 +77,20 @@ class NotesViewModel(
 //endregion
 
 //region Recycler Adapter
-class NotesAdapter(private val notes: NotesLiveData, lifecycleOwner: LifecycleOwner) :
+class NotesAdapter(private val notes: NotesLiveData, lifecycleOwner: LifecycleOwner, val onItemClicked: OnItemClicked) :
     RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
     init {
         notes.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
     }
 
+    interface OnItemClicked {
+        fun onClick(note: Note)
+    }
+
     override fun onCreateViewHolder(viewGroup: ViewGroup, possition: Int): NoteViewHolder =
         LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.item_note, viewGroup, false)
-            .let { NoteViewHolder(it) }
+            .let { NoteViewHolder(it, onItemClicked) }
 
 
     override fun getItemCount(): Int = notes.value?.size ?: 0
@@ -77,11 +100,13 @@ class NotesAdapter(private val notes: NotesLiveData, lifecycleOwner: LifecycleOw
         holder.bind(notes.value!![possition])
     }
 
-    class NoteViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    class NoteViewHolder(private val view: View, val onItemClicked: OnItemClicked) : RecyclerView.ViewHolder(view) {
 
 
         fun bind(note: Note) {
+
             view.txt_note.text = note.toString()
+            view.txt_note.setOnClickListener { onItemClicked.onClick(note) }
         }
     }
 }

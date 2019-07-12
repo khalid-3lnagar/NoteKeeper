@@ -15,6 +15,7 @@ import khalid.elnagar.notekeeper.domain.RetrieveAllCourses
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.io.Serializable
 
 class NoteActivity : AppCompatActivity() {
 
@@ -22,12 +23,24 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        intent
+            ?.getSerializableExtra(INTENT_EXTRA_NOTE)
+            ?.also { updateTitle(it) }
+
         setContentView(R.layout.activity_note)
         setSupportActionBar(toolbar)
 
         viewModel.courses.observe(this, Observer { initSpinner(it!!) })
         viewModel.retrieveAllCourses()
 
+    }
+
+    private fun updateTitle(it: Serializable) {
+        title = when (it as NoteScenario) {
+            NoteScenario.ADD_NOTE -> getString(R.string.add_note)
+            NoteScenario.EDIT_NOTE -> getString(R.string.edit_note)
+
+        }
     }
 
     private fun initSpinner(it: List<Course>) {
