@@ -4,7 +4,6 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import khalid.elnagar.notekeeper.Course
-import khalid.elnagar.notekeeper.domain.repositories.CourseRepository
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -18,14 +17,15 @@ class RetrieveAllCoursesTest {
     fun `RetrieveAllCourses with empty response then do nothing`() {
         //Arrange
         val repositoryMock = mock<CourseRepository> {
-            on { retrieveCourses() } doReturn listOf<Course>().toLiveData()
+            on { retrieveCourses() } doReturn listOf()
         }
-        val retrieveAllCourses = RetrieveAllCourses(repositoryMock)
+        val result = listOf<Course>().toMutableLiveData()
+        val retrieveAllCourses = RetrieveAllCourses(result, repositoryMock)
         //Act
-        val resultLiveData = retrieveAllCourses()
+        retrieveAllCourses()
 
         //Assert
-        Assert.assertTrue(resultLiveData.value?.isEmpty() ?: false)
+        Assert.assertTrue(result.value.isNullOrEmpty())
     }
 
     @Test
@@ -33,14 +33,15 @@ class RetrieveAllCoursesTest {
         //Arrange
         val courseMock = mock<Course> {}
         val repositoryMock = mock<CourseRepository> {
-            on { retrieveCourses() } doReturn listOf(courseMock).toLiveData()
+            on { retrieveCourses() } doReturn listOf(courseMock)
         }
-        val retrieveAllCourses = RetrieveAllCourses(repositoryMock)
+        val result = listOf<Course>().toMutableLiveData()
+
+        val retrieveAllCourses = RetrieveAllCourses(result, repositoryMock)
         //Act
-        val resultLiveData = retrieveAllCourses()
+        retrieveAllCourses()
 
         //Assert
-
-        Assert.assertTrue(resultLiveData.value?.isNotEmpty() ?: false)
+        Assert.assertTrue(result.value?.isNotEmpty() ?: false)
     }
 }

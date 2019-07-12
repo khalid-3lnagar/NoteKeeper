@@ -1,20 +1,17 @@
 package khalid.elnagar.notekeeper.domain
 
-import android.arch.lifecycle.LiveData
 import khalid.elnagar.notekeeper.Course
 import khalid.elnagar.notekeeper.Module
 import khalid.elnagar.notekeeper.Note
 
-typealias CoursesLiveData = LiveData<List<Course>>
-typealias NotesLiveData = LiveData<List<Note>>
 
 @Suppress("UNCHECKED_CAST")
 
 class InMemoryCoursesGetaway private constructor(
 
 ) {
-    private val courses by lazy { mutableListOf<Course>().toMutableLiveData() }
-    private val notes by lazy { mutableListOf<Note>().toMutableLiveData() }
+    private val courses by lazy { mutableListOf<Course>() }
+    private val notes by lazy { mutableListOf<Note>() }
 
     companion object {
         val instance by lazy {
@@ -25,11 +22,14 @@ class InMemoryCoursesGetaway private constructor(
         }
     }
 
-    fun retrieveCourses() = courses as CoursesLiveData
+    fun retrieveCourses() = courses.toList()
 
-    fun retrieveNotes() = notes as NotesLiveData
+    fun retrieveNotes() = notes.toList()
 
-    private fun getCourse(courseTitle: String): Course? = courses.value?.filter { it.title == courseTitle }?.get(0)
+    private fun getCourse(courseTitle: String): Course {
+
+        return courses.filter { it.courseId == courseTitle }[0]
+    }
 
 //region Initialization code
 
@@ -43,7 +43,7 @@ class InMemoryCoursesGetaway private constructor(
                 add(initializeCourse3())
                 add(initializeCourse4())
             }
-            .also { courses.postValue(it) }
+            .also { courses.addAll(it) }
 
     }
 
@@ -124,13 +124,13 @@ class InMemoryCoursesGetaway private constructor(
                 addAll(initializeNotes3())
                 addAll(initializeNotes4())
             }
-            .also { notes.postValue(it) }
+            .also { notes.addAll(it) }
 
     }
 
     private fun initializeNotes1(): List<Note> {
 
-        val course = getCourse("android_intents")!!
+        val course = getCourse("android_intents")
             .apply {
                 getModule("android_intents_m03").isComplete = true
                 getModule("android_intents_m02").isComplete = true
@@ -154,7 +154,7 @@ class InMemoryCoursesGetaway private constructor(
 
     private fun initializeNotes2(): List<Note> {
 
-        val course = getCourse("android_async")!!
+        val course = getCourse("android_async")
             .apply {
                 getModule("android_async_m01").isComplete = true
                 getModule("android_async_m02").isComplete = true
@@ -178,7 +178,7 @@ class InMemoryCoursesGetaway private constructor(
     }
 
     private fun initializeNotes3(): List<Note> {
-        val course = getCourse("java_lang")!!
+        val course = getCourse("java_lang")
 
         with(course) {
             getModule("java_lang_m01").isComplete = true
@@ -206,7 +206,7 @@ class InMemoryCoursesGetaway private constructor(
     }
 
     private fun initializeNotes4(): List<Note> {
-        val course = getCourse("java_core")!!
+        val course = getCourse("java_core")
             .apply {
                 getModule("java_core_m01").isComplete = true
                 getModule("java_core_m02").isComplete = true

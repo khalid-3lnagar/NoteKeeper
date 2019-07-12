@@ -12,6 +12,7 @@ import khalid.elnagar.notekeeper.Course
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.CoursesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllCourses
+import khalid.elnagar.notekeeper.domain.toMutableLiveData
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -24,8 +25,8 @@ class NoteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_note)
         setSupportActionBar(toolbar)
 
-        viewModel.courses.value.observe(this, Observer { initSpinner(it!!) })
-
+        viewModel.courses.observe(this, Observer { initSpinner(it!!) })
+        viewModel.retrieveAllCourses()
 
     }
 
@@ -57,6 +58,6 @@ class NoteActivity : AppCompatActivity() {
 }
 
 class NoteViewModel(
-    private val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(),
-    val courses: Lazy<CoursesLiveData> = lazy { retrieveAllCourses() }
+    val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
+    val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses)
 ) : ViewModel()
