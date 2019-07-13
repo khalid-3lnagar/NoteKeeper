@@ -13,7 +13,8 @@ class RetrieveAllCourses(
     private val coursesRepo: CourseRepository = CourseRepository()
 ) {
     operator fun invoke() {
-        coursesRepo.retrieveCourses()
+        coursesRepo
+            .retrieveCourses()
             .also { result.postValue(it) }
 
     }

@@ -21,13 +21,6 @@ import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_note.view.*
 
-const val INTENT_EXTRA_NOTE = "0"
-
-enum class NoteScenario {
-
-    ADD_NOTE, EDIT_NOTE
-}
-
 //region View
 class NoteListActivity : AppCompatActivity() {
 
@@ -36,8 +29,7 @@ class NoteListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { startNoteActivity(NoteScenario.ADD_NOTE) }
+        fab.setOnClickListener { startNoteActivity(null) }
         initRecyclerView()
         model.retrieveAllNotes()
     }
@@ -52,16 +44,15 @@ class NoteListActivity : AppCompatActivity() {
     private fun onItemClicked(): NotesAdapter.OnItemClicked {
         return object : NotesAdapter.OnItemClicked {
             override fun onClick(note: Note) {
-                startNoteActivity(NoteScenario.EDIT_NOTE)
+                startNoteActivity(note)
             }
         }
     }
 
-    private fun startNoteActivity(scenario: NoteScenario) {
+    private fun startNoteActivity(note: Note?) {
         Intent(this, NoteActivity::class.java)
-            .also { it.putExtra(INTENT_EXTRA_NOTE, scenario) }
+            .apply { note?.also { putExtra(INTENT_EXTRA_NOTE, it) } }
             .also(::startActivity)
-
     }
 
 }
@@ -77,7 +68,11 @@ class NotesViewModel(
 //endregion
 
 //region Recycler Adapter
-class NotesAdapter(private val notes: NotesLiveData, lifecycleOwner: LifecycleOwner, val onItemClicked: OnItemClicked) :
+class NotesAdapter(
+    private val notes: NotesLiveData,
+    lifecycleOwner: LifecycleOwner,
+    private val onItemClicked: OnItemClicked
+) :
     RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
     init {
         notes.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
@@ -100,7 +95,8 @@ class NotesAdapter(private val notes: NotesLiveData, lifecycleOwner: LifecycleOw
         holder.bind(notes.value!![possition])
     }
 
-    class NoteViewHolder(private val view: View, val onItemClicked: OnItemClicked) : RecyclerView.ViewHolder(view) {
+    class NoteViewHolder(private val view: View, private val onItemClicked: OnItemClicked) :
+        RecyclerView.ViewHolder(view) {
 
 
         fun bind(note: Note) {

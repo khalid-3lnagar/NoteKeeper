@@ -5,48 +5,56 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import khalid.elnagar.notekeeper.Course
+import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.CoursesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllCourses
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.io.Serializable
+
+const val INTENT_EXTRA_NOTE = "khalid.elnagar.notekeeper.Note"
 
 class NoteActivity : AppCompatActivity() {
 
     private val viewModel by lazy { ViewModelProviders.of(this).get(NoteViewModel::class.java) }
-
+    private val note: Note? by lazy { intent?.getParcelableExtra(INTENT_EXTRA_NOTE) as Note? }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        intent
-            ?.getSerializableExtra(INTENT_EXTRA_NOTE)
-            ?.also { updateTitle(it) }
-
         setContentView(R.layout.activity_note)
+        note?.also { editNote() } ?: addNote()
         setSupportActionBar(toolbar)
-
         viewModel.courses.observe(this, Observer { initSpinner(it!!) })
         viewModel.retrieveAllCourses()
 
     }
 
-    private fun updateTitle(it: Serializable) {
-        title = when (it as NoteScenario) {
-            NoteScenario.ADD_NOTE -> getString(R.string.add_note)
-            NoteScenario.EDIT_NOTE -> getString(R.string.edit_note)
 
-        }
+    private fun addNote() {
+        title = getString(R.string.add_note)
     }
 
-    private fun initSpinner(it: List<Course>) {
-        ArrayAdapter(this, android.R.layout.simple_spinner_item, it)
+    private fun editNote() {
+        title = getString(R.string.edit_note)
+
+        txtNoteTitle.text = Editable.Factory().newEditable(note?.noteTitle)
+        txt_note_body.text = Editable.Factory().newEditable(note?.note)
+
+
+    }
+
+
+    private fun initSpinner(courses: List<Course>) {
+        ArrayAdapter(this, android.R.layout.simple_spinner_item, courses)
             .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
             .also { spinner_courses.adapter = it }
+            .let { courses.indexOf(note?.course) }
+            .also { spinner_courses.setSelection(it) }
 
     }
 
