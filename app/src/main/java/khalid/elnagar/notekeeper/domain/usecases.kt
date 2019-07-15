@@ -40,8 +40,8 @@ class RetrieveNoteByPosition(
     operator fun invoke(position: Int) {
         notesRepo
             .retrieveNotes()
-            .let { it[position] }
-            .also { result.postValue(it) }
+            .let { it.getOrNull(position) }
+            ?.also { result.postValue(it) }
     }
 
 
