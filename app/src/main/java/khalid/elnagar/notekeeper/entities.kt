@@ -9,9 +9,9 @@ data class Note(
     val note: String,
     val course: Course
 ) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
+    private constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readParcelable(Course::class.java.classLoader)
     )
 
@@ -52,9 +52,9 @@ data class Course(
                 modules[i].isComplete = status[i]
         }
 
-    constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
+    private constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.createTypedArrayList(Module)
     )
 
@@ -87,8 +87,8 @@ data class Course(
 //region Module
 data class Module(val moduleId: String, val title: String, var isComplete: Boolean = false) : Parcelable {
     private constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString()!!,
+        parcel.readString()!!,
         parcel.readByte() != 0.toByte()
     )
 

@@ -43,15 +43,16 @@ class NoteListActivity : AppCompatActivity() {
 
     private fun onItemClicked(): NotesAdapter.OnItemClicked {
         return object : NotesAdapter.OnItemClicked {
-            override fun onClick(note: Note) {
-                startNoteActivity(note)
+            override fun onClick(position: Int) {
+                startNoteActivity(position)
             }
+
         }
     }
 
-    private fun startNoteActivity(note: Note?) {
+    private fun startNoteActivity(note: Int?) {
         Intent(this, NoteActivity::class.java)
-            .apply { note?.also { putExtra(INTENT_EXTRA_NOTE, it) } }
+            .apply { note?.also { putExtra(INTENT_EXTRA_NOTE_POSITION, it) } }
             .also(::startActivity)
     }
 
@@ -79,7 +80,7 @@ class NotesAdapter(
     }
 
     interface OnItemClicked {
-        fun onClick(note: Note)
+        fun onClick(position: Int)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, possition: Int): NoteViewHolder =
@@ -92,17 +93,17 @@ class NotesAdapter(
 
     override fun onBindViewHolder(holder: NoteViewHolder, possition: Int) {
 
-        holder.bind(notes.value!![possition])
+        holder.bind(notes.value!![possition], possition)
     }
 
     class NoteViewHolder(private val view: View, private val onItemClicked: OnItemClicked) :
         RecyclerView.ViewHolder(view) {
 
 
-        fun bind(note: Note) {
+        fun bind(note: Note, position: Int) {
 
             view.txt_note.text = note.toString()
-            view.txt_note.setOnClickListener { onItemClicked.onClick(note) }
+            view.txt_note.setOnClickListener { onItemClicked.onClick(position) }
         }
     }
 }

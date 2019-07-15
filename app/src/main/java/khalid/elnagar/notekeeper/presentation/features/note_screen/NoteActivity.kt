@@ -1,5 +1,6 @@
 package khalid.elnagar.notekeeper.presentation.features.note_screen
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
@@ -14,24 +15,38 @@ import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.CoursesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllCourses
+import khalid.elnagar.notekeeper.domain.RetrieveNoteByPosition
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
-const val INTENT_EXTRA_NOTE = "khalid.elnagar.notekeeper.Note"
+const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.Note"
+const val POSITION_NOT_SET = -1
 
 class NoteActivity : AppCompatActivity() {
 
     private val viewModel by lazy { ViewModelProviders.of(this).get(NoteViewModel::class.java) }
-    private val note: Note? by lazy { intent?.getParcelableExtra(INTENT_EXTRA_NOTE) as Note? }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
-        note?.also { editNote() } ?: addNote()
         setSupportActionBar(toolbar)
-        viewModel.courses.observe(this, Observer { initSpinner(it!!) })
-        viewModel.retrieveAllCourses()
+        initViewModel()
+    }
 
+    private fun initViewModel() {
+        with(viewModel) {
+
+            courses.observe(this@NoteActivity, Observer { initSpinner(it!!) })
+            retrieveAllCourses()
+
+            note.observe(this@NoteActivity, Observer { it?.also(::editNote) ?: addNote() })
+            intent
+                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, POSITION_NOT_SET)
+                .takeUnless { it == POSITION_NOT_SET }
+                ?.also { retrieveNoteByPosition(it) }
+
+        }
     }
 
 
@@ -39,12 +54,14 @@ class NoteActivity : AppCompatActivity() {
         title = getString(R.string.add_note)
     }
 
-    private fun editNote() {
+    private fun editNote(note: Note) {
         title = getString(R.string.edit_note)
 
-        txtNoteTitle.text = Editable.Factory().newEditable(note?.noteTitle)
-        txt_note_body.text = Editable.Factory().newEditable(note?.note)
-
+        txtNoteTitle.text = Editable.Factory().newEditable(note.noteTitle)
+        txt_note_body.text = Editable.Factory().newEditable(note.note)
+        viewModel.courses.value
+            ?.indexOf(note.course)
+            ?.also { spinner_courses.setSelection(it) }
 
     }
 
@@ -53,8 +70,8 @@ class NoteActivity : AppCompatActivity() {
         ArrayAdapter(this, android.R.layout.simple_spinner_item, courses)
             .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
             .also { spinner_courses.adapter = it }
-            .let { courses.indexOf(note?.course) }
-            .also { spinner_courses.setSelection(it) }
+            .let { viewModel.note.value }
+
 
     }
 
@@ -80,5 +97,7 @@ class NoteActivity : AppCompatActivity() {
 
 class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
-    val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses)
+    val note: MutableLiveData<Note?> = MutableLiveData<Note?>().also { it.postValue(null) },
+    val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
+    val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(note)
 ) : ViewModel()

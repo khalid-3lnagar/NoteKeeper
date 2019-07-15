@@ -7,7 +7,6 @@ import khalid.elnagar.notekeeper.Note
 typealias CoursesLiveData = MutableLiveData<List<Course>>
 typealias NotesLiveData = MutableLiveData<List<Note>>
 
-//get courses names
 class RetrieveAllCourses(
     private val result: CoursesLiveData,
     private val coursesRepo: CourseRepository = CourseRepository()
@@ -22,13 +21,26 @@ class RetrieveAllCourses(
 
 }
 
-//retrieve Notes
 class RetrieveAllNotes(
     private val result: NotesLiveData,
     private val notesRepo: NotesRepository = NotesRepository()
 ) {
     operator fun invoke() {
         notesRepo.retrieveNotes()
+            .also { result.postValue(it) }
+    }
+
+}
+
+class RetrieveNoteByPosition(
+    private val result: MutableLiveData<Note?>,
+    private val notesRepo: NotesRepository = NotesRepository()
+) {
+
+    operator fun invoke(position: Int) {
+        notesRepo
+            .retrieveNotes()
+            .let { it[position] }
             .also { result.postValue(it) }
     }
 
