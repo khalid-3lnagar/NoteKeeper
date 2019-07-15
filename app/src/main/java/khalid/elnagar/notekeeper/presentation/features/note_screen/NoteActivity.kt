@@ -14,15 +14,12 @@ import android.widget.ArrayAdapter
 import khalid.elnagar.notekeeper.Course
 import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
-import khalid.elnagar.notekeeper.domain.CoursesLiveData
-import khalid.elnagar.notekeeper.domain.RetrieveAllCourses
-import khalid.elnagar.notekeeper.domain.RetrieveNoteByPosition
-import khalid.elnagar.notekeeper.domain.toMutableLiveData
+import khalid.elnagar.notekeeper.domain.*
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
 const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.Note"
-const val POSITION_NOT_SET = -1
+
 
 class NoteActivity : AppCompatActivity() {
 
@@ -43,9 +40,10 @@ class NoteActivity : AppCompatActivity() {
 
             note.observe(this@NoteActivity, Observer { it?.also(::editNote) ?: addNote() })
             intent
-                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, POSITION_NOT_SET)
-                .takeUnless { it == POSITION_NOT_SET }
+                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, NEW_NODE)
+                .takeUnless { it == NEW_NODE }
                 ?.also { retrieveNoteByPosition(it) }
+                ?.also { position.postValue(it) }
 
         }
     }
@@ -113,13 +111,31 @@ class NoteActivity : AppCompatActivity() {
             .also(::startActivity)
 
     }
-//endregion
 
+    //endregion
+
+    override fun onPause() {
+        super.onPause()
+        saveNote()
+    }
+
+    private fun saveNote() {
+        Note(
+            txtNoteTitle.text.toString(),
+            txt_note_body.text.toString(),
+            spinner_courses.selectedItem as Course
+
+        ).also { viewModel.saveNoteByPosition(it) }
+
+
+    }
 }
 
 class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
     val note: MutableLiveData<Note?> = MutableLiveData<Note?>().also { it.postValue(null) },
+    val position: MutableLiveData<Int> = (-1).toMutableLiveData(),
     val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
-    val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(note)
+    val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(note),
+    val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position)
 ) : ViewModel()

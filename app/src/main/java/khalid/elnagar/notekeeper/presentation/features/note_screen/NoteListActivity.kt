@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
+import khalid.elnagar.notekeeper.domain.NEW_NODE
 import khalid.elnagar.notekeeper.domain.NotesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllNotes
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
@@ -29,8 +30,13 @@ class NoteListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
         setSupportActionBar(toolbar)
-        fab.setOnClickListener { startNoteActivity(null) }
+        fab.setOnClickListener { startNoteActivity(NEW_NODE) }
         initRecyclerView()
+        model.retrieveAllNotes()
+    }
+
+    override fun onResume() {
+        super.onResume()
         model.retrieveAllNotes()
     }
 
@@ -50,15 +56,16 @@ class NoteListActivity : AppCompatActivity() {
         }
     }
 
-    private fun startNoteActivity(note: Int?) {
+    private fun startNoteActivity(position: Int) {
         Intent(this, NoteActivity::class.java)
-            .apply { note?.also { putExtra(INTENT_EXTRA_NOTE_POSITION, it) } }
+            .apply { position.also { putExtra(INTENT_EXTRA_NOTE_POSITION, it) } }
             .also(::startActivity)
     }
 
 }
 
 //endregion
+
 //region ViewModel
 
 class NotesViewModel(

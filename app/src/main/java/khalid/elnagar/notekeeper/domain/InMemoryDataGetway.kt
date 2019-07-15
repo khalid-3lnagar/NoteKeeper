@@ -6,6 +6,7 @@ import khalid.elnagar.notekeeper.Note
 
 
 @Suppress("UNCHECKED_CAST")
+const val NEW_NODE = -1
 
 class InMemoryCoursesGetaway private constructor(
 
@@ -30,6 +31,14 @@ class InMemoryCoursesGetaway private constructor(
 
         return courses.filter { it.courseId == courseTitle }[0]
     }
+
+    fun saveNote(note: Note, position: Int) {
+        if (position == NEW_NODE)
+            notes.add(note)
+        else
+            notes[position] = note
+    }
+
 
 //region Initialization code
 

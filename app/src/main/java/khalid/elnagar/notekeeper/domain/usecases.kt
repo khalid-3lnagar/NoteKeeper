@@ -46,3 +46,17 @@ class RetrieveNoteByPosition(
 
 
 }
+
+class SaveNoteByPosition(
+    private val position: MutableLiveData<Int>,
+    private val notesRepo: NotesRepository = NotesRepository()
+) {
+
+    operator fun invoke(note: Note) {
+        notesRepo.saveNote(note, position.value ?: NEW_NODE)
+
+
+    }
+
+
+}
