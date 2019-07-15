@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -87,9 +88,30 @@ class NoteActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_send_mail -> true
+            R.id.action_send_mail -> {
+                sendToMail()
+                true
+
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun sendToMail() {
+        val subject = txtNoteTitle.text.toString()
+        val course = spinner_courses.selectedItem as Course
+        val text = "checkout what I learned in the pluralsight course \"${course.title}\"\n ${txt_note_body.text}"
+
+
+        Intent(Intent.ACTION_SEND)
+            .apply {
+                type = "message/rfc822"
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_TEXT, text)
+            }
+            .also(::startActivity)
+
     }
 //endregion
 
