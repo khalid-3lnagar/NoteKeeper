@@ -32,7 +32,7 @@ class NoteListActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         fab.setOnClickListener { startNoteActivity(NEW_NODE) }
         initRecyclerView()
-        model.retrieveAllNotes()
+
     }
 
     override fun onResume() {

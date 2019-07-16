@@ -23,7 +23,7 @@ const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.Note"
 
 class NoteActivity : AppCompatActivity() {
 
-    private val viewModel by lazy { ViewModelProviders.of(this).get(NoteViewModel::class.java) }
+    private val model by lazy { ViewModelProviders.of(this).get(NoteViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +33,7 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun initViewModel() {
-        with(viewModel) {
+        with(model) {
 
             courses.observe(this@NoteActivity, Observer { initSpinner(it!!) })
             retrieveAllCourses()
@@ -58,7 +58,7 @@ class NoteActivity : AppCompatActivity() {
 
         txtNoteTitle.text = Editable.Factory().newEditable(note.noteTitle)
         txt_note_body.text = Editable.Factory().newEditable(note.note)
-        viewModel.courses.value
+        model.courses.value
             ?.indexOf(note.course)
             ?.also { spinner_courses.setSelection(it) }
 
@@ -69,9 +69,6 @@ class NoteActivity : AppCompatActivity() {
         ArrayAdapter(this, android.R.layout.simple_spinner_item, courses)
             .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
             .also { spinner_courses.adapter = it }
-            .let { viewModel.note.value }
-
-
     }
 
     //region Menu
@@ -89,9 +86,12 @@ class NoteActivity : AppCompatActivity() {
             R.id.action_send_mail -> {
                 sendToMail()
                 true
-
             }
-
+            R.id.action_cancel -> {
+                model.isCancelling.postValue(true)
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -116,7 +116,11 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        saveNote()
+        model
+            .isCancelling.value
+            .takeUnless { it == true }
+            ?.also { saveNote() }
+
     }
 
     private fun saveNote() {
@@ -125,7 +129,7 @@ class NoteActivity : AppCompatActivity() {
             txt_note_body.text.toString(),
             spinner_courses.selectedItem as Course
 
-        ).also { viewModel.saveNoteByPosition(it) }
+        ).also { model.saveNoteByPosition(it) }
 
 
     }
@@ -134,7 +138,8 @@ class NoteActivity : AppCompatActivity() {
 class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
     val note: MutableLiveData<Note?> = MutableLiveData<Note?>().also { it.postValue(null) },
-    val position: MutableLiveData<Int> = (-1).toMutableLiveData(),
+    val position: MutableLiveData<Int> = NEW_NODE.toMutableLiveData(),
+    val isCancelling: MutableLiveData<Boolean> = false.toMutableLiveData(),
     val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
     val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(note),
     val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position)
