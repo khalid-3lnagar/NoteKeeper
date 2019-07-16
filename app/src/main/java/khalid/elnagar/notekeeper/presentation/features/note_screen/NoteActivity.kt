@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -45,6 +44,7 @@ class NoteActivity : AppCompatActivity() {
                 ?.also { retrieveNoteByPosition(it) }
                 ?.also { position.postValue(it) }
 
+
         }
     }
 
@@ -54,10 +54,11 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun editNote(note: Note) {
+
         title = getString(R.string.edit_note)
 
-        txtNoteTitle.text = Editable.Factory().newEditable(note.noteTitle)
-        txt_note_body.text = Editable.Factory().newEditable(note.note)
+        txtNoteTitle.setText(note.noteTitle)
+        txt_note_body.setText(note.note)
         model.courses.value
             ?.indexOf(note.course)
             ?.also { spinner_courses.setSelection(it) }
@@ -118,10 +119,17 @@ class NoteActivity : AppCompatActivity() {
         super.onPause()
         model
             .isCancelling.value
+            .takeIf { it == true }
+            ?.let { model.note.value }
+            ?.also { storePreviousNoteValue() }
+            .let { model.isCancelling.value }
             .takeUnless { it == true }
             ?.also { saveNote() }
 
     }
+
+    private fun storePreviousNoteValue() = model.note.value?.let { model.saveNoteByPosition(it) }
+
 
     private fun saveNote() {
         Note(
