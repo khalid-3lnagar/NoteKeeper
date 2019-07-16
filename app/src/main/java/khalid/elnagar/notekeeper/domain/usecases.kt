@@ -1,5 +1,6 @@
 package khalid.elnagar.notekeeper.domain
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import khalid.elnagar.notekeeper.Course
 import khalid.elnagar.notekeeper.Note
@@ -44,7 +45,6 @@ class RetrieveNoteByPosition(
             ?.also { result.postValue(it) }
     }
 
-
 }
 
 class SaveNoteByPosition(
@@ -53,10 +53,21 @@ class SaveNoteByPosition(
 ) {
 
     operator fun invoke(note: Note) {
-        notesRepo.saveNote(note, position.value ?: NEW_NODE)
+        notesRepo
+            .saveNote(note, position.value ?: NEW_NODE)
+            .also { position.postValue(it) }
 
 
     }
+}
 
-
+class RemoveNoteByPosition(
+    private val position: LiveData<Int>,
+    private val notesRepo: NotesRepository = NotesRepository()
+) {
+    operator fun invoke() {
+        position
+            .value
+            ?.let { notesRepo.removeNoteByPosition(it) }
+    }
 }

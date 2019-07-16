@@ -23,20 +23,30 @@ class InMemoryCoursesGetaway private constructor(
         }
     }
 
-    fun retrieveCourses() = courses.toList()
-
     fun retrieveNotes() = notes.toList()
+
+    fun saveNote(note: Note, position: Int): Int {
+        return if (position == NEW_NODE) {
+            notes.add(note)
+
+            notes.size - 1
+        } else {
+            notes[position] = note
+
+            position
+        }
+
+    }
+
+    fun removeNoteByPosition(position: Int) {
+        notes.removeAt(position)
+    }
+
+    fun retrieveCourses() = courses.toList()
 
     private fun getCourse(courseTitle: String): Course {
 
         return courses.filter { it.courseId == courseTitle }[0]
-    }
-
-    fun saveNote(note: Note, position: Int) {
-        if (position == NEW_NODE)
-            notes.add(note)
-        else
-            notes[position] = note
     }
 
 
