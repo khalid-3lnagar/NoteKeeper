@@ -34,14 +34,16 @@ class RetrieveAllNotes(
 }
 
 class RetrieveNoteByPosition(
+    private val position: MutableLiveData<Int>,
     private val result: MutableLiveData<Note?>,
+
     private val notesRepo: NotesRepository = NotesRepository()
 ) {
 
-    operator fun invoke(position: Int) {
+    operator fun invoke() {
         notesRepo
             .retrieveNotes()
-            .let { it.getOrNull(position) }
+            .let { it.getOrNull(position.value ?: NEW_NODE) }
             ?.also { result.postValue(it) }
     }
 
@@ -70,4 +72,11 @@ class RemoveNoteByPosition(
             .value
             ?.let { notesRepo.removeNoteByPosition(it) }
     }
+}
+
+class RetrieveCourseById(
+    private val coursesRepo: CourseRepository = CourseRepository()
+) {
+    operator fun invoke(courseId: String): Course = coursesRepo.retrieveCourse(courseId)
+
 }

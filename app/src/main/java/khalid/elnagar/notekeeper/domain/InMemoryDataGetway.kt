@@ -44,8 +44,7 @@ class InMemoryCoursesGetaway private constructor(
 
     fun retrieveCourses() = courses.toList()
 
-    private fun getCourse(courseTitle: String): Course {
-
+    fun getCourse(courseTitle: String): Course {
         return courses.filter { it.courseId == courseTitle }[0]
     }
 

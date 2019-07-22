@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -18,7 +19,12 @@ import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
 const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.Note"
+private const val SAVED_INSTANCE_ORIGINAL_NOTE = "khalid.elnagar.notekeeper.FIRST_CREATION"
+private const val NOTE_TITLE_INDEX = 0
 
+private const val NOTE_TITLE = 1
+
+private const val COURSE_ID_INDEX = 2
 
 class NoteActivity : AppCompatActivity() {
 
@@ -26,6 +32,11 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        savedInstanceState
+            ?.getStringArrayList(SAVED_INSTANCE_ORIGINAL_NOTE)
+            ?.also { model.originalValue.postValue(it) }
+
         setContentView(R.layout.activity_note)
         setSupportActionBar(toolbar)
         initViewModel()
@@ -38,19 +49,29 @@ class NoteActivity : AppCompatActivity() {
             retrieveAllCourses()
 
             note.observe(this@NoteActivity, Observer { it?.also(::editNote) ?: addNote() })
+
+            position.observe(this@NoteActivity, Observer { onReceivePosition(it) })
+
             intent
                 .getIntExtra(INTENT_EXTRA_NOTE_POSITION, NEW_NODE)
+                .also(position::postValue)
                 .takeUnless { it == NEW_NODE }
-                ?.also { retrieveNoteByPosition(it) }
-                ?.also { position.postValue(it) }
-
+                ?.also { isNewNode.postValue(false) }
 
         }
+    }
+
+    private fun NoteViewModel.onReceivePosition(it: Int?) {
+        if (it == NEW_NODE)
+            note.postValue(null)
+        else
+            retrieveNoteByPosition()
     }
 
 
     private fun addNote() {
         title = getString(R.string.add_note)
+        saveNote()
     }
 
     private fun editNote(note: Note) {
@@ -63,6 +84,15 @@ class NoteActivity : AppCompatActivity() {
             ?.indexOf(note.course)
             ?.also { spinner_courses.setSelection(it) }
 
+        if (model.originalValue.value.isNullOrEmpty()) {
+            arrayListOf(
+                note.noteTitle,
+                note.note,
+                note.course.courseId
+
+            ).also { model.originalValue.postValue(it) }
+
+        }
     }
 
 
@@ -116,22 +146,43 @@ class NoteActivity : AppCompatActivity() {
     //endregion
 
     override fun onPause() {
+        Log.d(TAG, "onPause")
         super.onPause()
-        model
-            .isCancelling.value
-            .takeIf { it == true }
-            ?.let { model.note.value }
-            ?.also { storePreviousNoteValue() }
-            .let { model.isCancelling.value }
-            .takeUnless { it == true }
-            ?.also { saveNote() }
+        if (model.isCancelling.value == true) {
+            Log.d(TAG, "onPause: cancelling")
+
+            if (model.isNewNode.value != false) {
+                Log.d(TAG, "onPause: cancelling: removing New Note")
+                model.removeNoteByPosition()
+            } else {
+                Log.d(TAG, "onPause: cancelling: restore Original Note")
+                restorePreviousNoteValue()
+            }
+        } else {
+            saveNote()
+        }
+
 
     }
 
-    private fun storePreviousNoteValue() = model.note.value?.let { model.saveNoteByPosition(it) }
+
+    private fun restorePreviousNoteValue() {
+
+        if (!model.originalValue.value.isNullOrEmpty()) {
+            Note(
+                model.originalValue.value!![NOTE_TITLE_INDEX],
+                model.originalValue.value!![NOTE_TITLE],
+                model.getCourse(model.originalValue.value!![COURSE_ID_INDEX])
+
+            ).also { model.saveNoteByPosition(it) }
+        } else
+            Log.d(TAG, "Error while restore Previous Value")
+
+    }
 
 
     private fun saveNote() {
+        Log.d(TAG, "save Note at ${model.position.value}")
         Note(
             txtNoteTitle.text.toString(),
             txt_note_body.text.toString(),
@@ -139,16 +190,28 @@ class NoteActivity : AppCompatActivity() {
 
         ).also { model.saveNoteByPosition(it) }
 
+    }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        Log.d(TAG, "onSaveInstanceState: saving note original value")
+        outState?.putStringArrayList(SAVED_INSTANCE_ORIGINAL_NOTE, model.originalValue.value)
     }
 }
 
 class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
-    val note: MutableLiveData<Note?> = MutableLiveData<Note?>().also { it.postValue(null) },
+    val note: MutableLiveData<Note?> = MutableLiveData(),
+    val originalValue: MutableLiveData<ArrayList<String>> = arrayListOf<String>().toMutableLiveData(),
     val position: MutableLiveData<Int> = NEW_NODE.toMutableLiveData(),
+    val isNewNode: MutableLiveData<Boolean> = true.toMutableLiveData(),
     val isCancelling: MutableLiveData<Boolean> = false.toMutableLiveData(),
+
     val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
-    val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(note),
-    val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position)
-) : ViewModel()
+    val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(position, note),
+    val retrieveCourseById: RetrieveCourseById = RetrieveCourseById(),
+    val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position),
+    val removeNoteByPosition: RemoveNoteByPosition = RemoveNoteByPosition(position)
+) : ViewModel() {
+    fun getCourse(courseId: String): Course = retrieveCourseById(courseId)
+}

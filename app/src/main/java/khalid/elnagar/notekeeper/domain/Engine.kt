@@ -7,6 +7,4 @@ fun <T> T.toMutableLiveData(): MutableLiveData<T> = MutableLiveData<T>().also { 
 
 fun <T> T.toLiveData(): LiveData<T> = MutableLiveData<T>().also { it.postValue(this) }
 
-
-
-
+val Any.TAG: String get() = javaClass.simpleName
