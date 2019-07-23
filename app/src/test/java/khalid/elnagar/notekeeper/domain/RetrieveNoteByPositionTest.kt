@@ -2,10 +2,11 @@ package khalid.elnagar.notekeeper.domain
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+
 import khalid.elnagar.notekeeper.entities.Note
-import org.junit.Assert
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -14,32 +15,37 @@ class RetrieveNoteByPositionTest {
     @Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    private val dataGetWay by lazy { InMemoryDataGetWay.instance }
+
+    @Before
+    fun setUp() {
+        dataGetWay.restart()
+    }
+
     @Test
     fun `RetrieveNoteByPosition with position then update result`() {
+        //Arrange
         val position = (0).toMutableLiveData()
         val result = MutableLiveData<Note?>()
-        val repositoryMock = mock<NotesRepository> {
-            on { retrieveNotes() } doReturn listOf(mock {})
-        }
-        val retrieveNoteByPosition = RetrieveNoteByPosition(position, result, repositoryMock)
+        val retrieveNoteByPosition = RetrieveNoteByPosition(position, result)
 
+        //Act
         retrieveNoteByPosition()
 
-        Assert.assertTrue(result.value != null)
+        //Assert
+        assertNotNull(result.value)
     }
 
     @Test
     fun `RetrieveNoteByPosition with incorrect position then do nothing`() {
-        val position = (1).toMutableLiveData()
+        val position = New_Note.toMutableLiveData()
 
-        val result = MutableLiveData<Note?>().apply { value = null }
-        val repositoryMock = mock<NotesRepository> {
-            on { retrieveNotes() } doReturn listOf()
-        }
-        val retrieveNoteByPosition = RetrieveNoteByPosition(position, result, repositoryMock)
+        val result = MutableLiveData<Note?>()
+
+        val retrieveNoteByPosition = RetrieveNoteByPosition(position, result)
 
         retrieveNoteByPosition()
 
-        Assert.assertTrue(result.value == null)
+        assertNull(result.value)
     }
 }

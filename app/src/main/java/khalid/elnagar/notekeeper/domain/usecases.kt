@@ -55,7 +55,7 @@ class RetrieveNoteByPosition(
     operator fun invoke() {
         notesRepo
             .retrieveNotes()
-            .let { it.getOrNull(position.value ?: NEW_NODE) }
+            .let { it.getOrNull(position.value ?: New_Note) }
             ?.also { result.postValue(it) }
     }
 
@@ -67,7 +67,7 @@ class SaveNoteByPosition(
 ) {
     operator fun invoke(note: Note) {
         notesRepo
-            .saveNote(note, position.value ?: NEW_NODE)
+            .saveNote(note, position.value ?: New_Note)
             .also { position.postValue(it) }
 
 

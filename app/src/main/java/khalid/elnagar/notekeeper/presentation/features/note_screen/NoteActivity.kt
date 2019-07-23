@@ -53,16 +53,16 @@ class NoteActivity : AppCompatActivity() {
             position.observe(this@NoteActivity, Observer { onReceivePosition(it) })
 
             intent
-                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, NEW_NODE)
+                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, New_Note)
                 .also(position::postValue)
-                .takeUnless { it == NEW_NODE }
+                .takeUnless { it == New_Note }
                 ?.also { isNewNode.postValue(false) }
 
         }
     }
 
     private fun NoteViewModel.onReceivePosition(it: Int?) {
-        if (it == NEW_NODE)
+        if (it == New_Note)
             note.postValue(null)
         else
             retrieveNoteByPosition()
@@ -203,7 +203,7 @@ class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
     val note: MutableLiveData<Note?> = MutableLiveData(),
     val originalValue: MutableLiveData<ArrayList<String>> = arrayListOf<String>().toMutableLiveData(),
-    val position: MutableLiveData<Int> = NEW_NODE.toMutableLiveData(),
+    val position: MutableLiveData<Int> = New_Note.toMutableLiveData(),
     val isNewNode: MutableLiveData<Boolean> = true.toMutableLiveData(),
     val isCancelling: MutableLiveData<Boolean> = false.toMutableLiveData(),
 

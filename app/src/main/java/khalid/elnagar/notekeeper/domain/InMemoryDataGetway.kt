@@ -1,13 +1,10 @@
 package khalid.elnagar.notekeeper.domain
 
-import khalid.elnagar.notekeeper.entities.Course
-import khalid.elnagar.notekeeper.entities.CourseNotFoundException
-import khalid.elnagar.notekeeper.entities.Module
-import khalid.elnagar.notekeeper.entities.Note
+import khalid.elnagar.notekeeper.entities.*
 
 
 @Suppress("UNCHECKED_CAST")
-const val NEW_NODE = -1
+const val New_Note = -1
 
 class InMemoryDataGetWay private constructor(
 
@@ -27,7 +24,7 @@ class InMemoryDataGetWay private constructor(
     fun retrieveNotes() = notes.toList()
 
     fun saveNote(note: Note, position: Int): Int {
-        return if (position == NEW_NODE) {
+        return if (position == New_Note) {
             notes.add(note)
             notes.size - 1
         } else {
@@ -38,6 +35,8 @@ class InMemoryDataGetWay private constructor(
     }
 
     fun removeNoteByPosition(position: Int) {
+        if (position !in 0 until notes.size)
+            throw NoteNoteFoundException()
         notes.removeAt(position)
     }
 
@@ -52,11 +51,14 @@ class InMemoryDataGetWay private constructor(
         clearCourses()
         initializeCourses()
 
-        notes.clear()
+        clearNotes()
         initializeExampleNotes()
     }
 
     fun clearCourses() = courses.clear()
+
+    fun clearNotes() = notes.clear()
+
 //region Initialization code
 
     //region initialize Courses
