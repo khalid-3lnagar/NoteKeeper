@@ -11,14 +11,14 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import khalid.elnagar.notekeeper.Course
-import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.*
+import khalid.elnagar.notekeeper.entities.Course
+import khalid.elnagar.notekeeper.entities.Note
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
-const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.Note"
+const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.entities.Note"
 private const val SAVED_INSTANCE_ORIGINAL_NOTE = "khalid.elnagar.notekeeper.FIRST_CREATION"
 private const val NOTE_TITLE_INDEX = 0
 

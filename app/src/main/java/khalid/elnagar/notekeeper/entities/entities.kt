@@ -1,4 +1,4 @@
-package khalid.elnagar.notekeeper
+package khalid.elnagar.notekeeper.entities
 
 import android.os.Parcel
 import android.os.Parcelable

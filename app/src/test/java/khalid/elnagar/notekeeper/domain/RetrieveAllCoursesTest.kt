@@ -1,10 +1,9 @@
 package khalid.elnagar.notekeeper.domain
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import khalid.elnagar.notekeeper.Course
+import khalid.elnagar.notekeeper.entities.Course
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,14 +12,19 @@ class RetrieveAllCoursesTest {
     @Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    private val dataGetWay by lazy { InMemoryDataGetWay.instance }
+
+    @Before
+    fun setUp() {
+        dataGetWay.restart()
+    }
+
     @Test
     fun `RetrieveAllCourses with empty response then do nothing`() {
         //Arrange
-        val repositoryMock = mock<CourseRepository> {
-            on { retrieveCourses() } doReturn listOf()
-        }
         val result = listOf<Course>().toMutableLiveData()
-        val retrieveAllCourses = RetrieveAllCourses(result, repositoryMock)
+        val retrieveAllCourses = RetrieveAllCourses(result)
+        dataGetWay.clearCourses()
         //Act
         retrieveAllCourses()
 
@@ -31,13 +35,10 @@ class RetrieveAllCoursesTest {
     @Test
     fun `RetrieveAllCourses with response then Update UiLiveData`() {
         //Arrange
-        val courseMock = mock<Course> {}
-        val repositoryMock = mock<CourseRepository> {
-            on { retrieveCourses() } doReturn listOf(courseMock)
-        }
+
         val result = listOf<Course>().toMutableLiveData()
 
-        val retrieveAllCourses = RetrieveAllCourses(result, repositoryMock)
+        val retrieveAllCourses = RetrieveAllCourses(result)
         //Act
         retrieveAllCourses()
 

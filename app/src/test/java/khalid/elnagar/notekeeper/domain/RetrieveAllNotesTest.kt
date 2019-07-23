@@ -3,7 +3,7 @@ package khalid.elnagar.notekeeper.domain
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import khalid.elnagar.notekeeper.Note
+import khalid.elnagar.notekeeper.entities.Note
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test

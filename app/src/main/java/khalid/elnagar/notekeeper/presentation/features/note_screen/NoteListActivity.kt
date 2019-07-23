@@ -12,12 +12,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import khalid.elnagar.notekeeper.Note
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.NEW_NODE
 import khalid.elnagar.notekeeper.domain.NotesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllNotes
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
+import khalid.elnagar.notekeeper.entities.Note
 import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_note.view.*
