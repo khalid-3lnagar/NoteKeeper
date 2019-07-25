@@ -1,4 +1,4 @@
-package khalid.elnagar.notekeeper.presentation.features.note_screen
+package khalid.elnagar.notekeeper.presentation.features
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
@@ -26,6 +26,15 @@ import kotlinx.android.synthetic.main.item_note.view.*
 class NoteListActivity : AppCompatActivity() {
 
     private val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }
+    private val onItemClicked by lazy {
+        object : NotesAdapter.OnItemClicked {
+            override fun onClick(position: Int) {
+                startNoteActivity(position)
+            }
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
@@ -43,18 +52,14 @@ class NoteListActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         with(rv_list_notes) {
             layoutManager = LinearLayoutManager(this@NoteListActivity)
-            adapter = NotesAdapter(model.notes, this@NoteListActivity, onItemClicked())
+            adapter = NotesAdapter(
+                model.notes,
+                this@NoteListActivity,
+                onItemClicked
+            )
         }
     }
 
-    private fun onItemClicked(): NotesAdapter.OnItemClicked {
-        return object : NotesAdapter.OnItemClicked {
-            override fun onClick(position: Int) {
-                startNoteActivity(position)
-            }
-
-        }
-    }
 
     private fun startNoteActivity(position: Int) {
         Intent(this, NoteActivity::class.java)
@@ -90,7 +95,7 @@ class NotesAdapter(
         fun onClick(position: Int)
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, possition: Int): NoteViewHolder =
+    override fun onCreateViewHolder(viewGroup: ViewGroup, position: Int): NoteViewHolder =
         LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.item_note, viewGroup, false)
             .let { NoteViewHolder(it, onItemClicked) }
@@ -98,9 +103,9 @@ class NotesAdapter(
 
     override fun getItemCount(): Int = notes.value?.size ?: 0
 
-    override fun onBindViewHolder(holder: NoteViewHolder, possition: Int) {
+    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
 
-        holder.bind(notes.value!![possition], possition)
+        holder.bind(notes.value!![position], position)
     }
 
     class NoteViewHolder(private val view: View, private val onItemClicked: OnItemClicked) :
@@ -108,9 +113,11 @@ class NotesAdapter(
 
 
         fun bind(note: Note, position: Int) {
-
-            view.txt_note.text = note.toString()
-            view.txt_note.setOnClickListener { onItemClicked.onClick(position) }
+            with(view) {
+                txt_note.text = note.noteTitle
+                txt_note_course.text = note.course.title
+                note_item.setOnClickListener { onItemClicked.onClick(position) }
+            }
         }
     }
 }

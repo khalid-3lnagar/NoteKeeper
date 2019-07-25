@@ -1,4 +1,4 @@
-package khalid.elnagar.notekeeper.presentation.features.note_screen
+package khalid.elnagar.notekeeper.presentation.features
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer

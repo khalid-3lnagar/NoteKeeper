@@ -15,6 +15,7 @@ import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.InMemoryDataGetWay
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
+import khalid.elnagar.notekeeper.presentation.features.NoteListActivity
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Rule
