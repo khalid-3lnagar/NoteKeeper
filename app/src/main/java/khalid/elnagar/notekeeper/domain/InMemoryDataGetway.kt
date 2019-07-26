@@ -6,19 +6,14 @@ import khalid.elnagar.notekeeper.entities.*
 @Suppress("UNCHECKED_CAST")
 const val New_Note = -1
 
-class InMemoryDataGetWay private constructor(
-
-) {
+object InMemoryDataGetWay {
     private val courses by lazy { mutableListOf<Course>() }
     private val notes by lazy { mutableListOf<Note>() }
 
-    companion object {
-        val instance by lazy {
-            InMemoryDataGetWay().apply {
-                initializeCourses()
-                initializeExampleNotes()
-            }
-        }
+    init {
+        initializeCourses()
+        initializeExampleNotes()
+
     }
 
     fun retrieveNotes() = notes.toList()

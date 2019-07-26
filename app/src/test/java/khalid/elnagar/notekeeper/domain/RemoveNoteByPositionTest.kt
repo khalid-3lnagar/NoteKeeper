@@ -15,7 +15,7 @@ class RemoveNoteByPositionTest {
     @Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private val dataGetWay by lazy { InMemoryDataGetWay.instance }
+    private val dataGetWay by lazy { InMemoryDataGetWay }
 
     @Before
     fun setUp() {

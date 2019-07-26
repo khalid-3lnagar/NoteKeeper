@@ -14,7 +14,7 @@ class RetrieveCourseByIdTest {
 
     @Before
     fun setUp() {
-        InMemoryDataGetWay.instance.restart()
+        InMemoryDataGetWay.restart()
     }
 
     @Test
