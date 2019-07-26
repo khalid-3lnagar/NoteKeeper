@@ -4,7 +4,7 @@ import khalid.elnagar.notekeeper.entities.*
 
 
 @Suppress("UNCHECKED_CAST")
-const val New_Note = -1
+const val NEW_NOTE = -1
 
 object InMemoryDataGetWay {
     private val courses by lazy { mutableListOf<Course>() }
@@ -19,7 +19,7 @@ object InMemoryDataGetWay {
     fun retrieveNotes() = notes.toList()
 
     fun saveNote(note: Note, position: Int): Int {
-        return if (position == New_Note) {
+        return if (position == NEW_NOTE) {
             notes.add(note)
             notes.size - 1
         } else {

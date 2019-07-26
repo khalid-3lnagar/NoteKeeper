@@ -13,7 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import khalid.elnagar.notekeeper.R
-import khalid.elnagar.notekeeper.domain.New_Note
+import khalid.elnagar.notekeeper.domain.NEW_NOTE
 import khalid.elnagar.notekeeper.domain.NotesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllNotes
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
@@ -39,7 +39,7 @@ class NoteListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
         setSupportActionBar(toolbar)
-        fab.setOnClickListener { startNoteActivity(New_Note) }
+        fab.setOnClickListener { startNoteActivity(NEW_NOTE) }
         initRecyclerView()
 
     }

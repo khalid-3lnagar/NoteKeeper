@@ -2,9 +2,12 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="khalid.elnagar.notekeeper.presentation.features.NoteActivity">
-    <item android:title="@android:string/cancel" android:orderInCategory="100" android:id="@+id/action_cancel"/>
-    <item android:id="@+id/action_send_mail"
-          android:title="@string/action_send_mail"
-          android:orderInCategory="101"
-          app:showAsAction="never"/>
+	<item android:title="@android:string/cancel" android:orderInCategory="100" android:id="@+id/action_cancel"
+	      android:icon="@android:drawable/ic_menu_revert" app:showAsAction="ifRoom|withText"/>
+	<item android:title="@string/next" android:orderInCategory="101" android:id="@+id/action_next"
+	      android:icon="@android:drawable/ic_media_next" app:showAsAction="ifRoom|withText"/>
+	<item android:id="@+id/action_send_mail"
+	      android:title="@string/action_send_mail"
+	      android:orderInCategory="102"
+	      app:showAsAction="never"/>
 </menu>

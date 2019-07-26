@@ -38,7 +38,7 @@ class RetrieveNoteByPositionTest {
 
     @Test
     fun `RetrieveNoteByPosition with incorrect position then do nothing`() {
-        val position = New_Note.toMutableLiveData()
+        val position = NEW_NOTE.toMutableLiveData()
 
         val result = MutableLiveData<Note?>()
 

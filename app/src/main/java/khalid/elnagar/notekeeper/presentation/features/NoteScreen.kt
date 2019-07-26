@@ -53,19 +53,12 @@ class NoteActivity : AppCompatActivity() {
             position.observe(this@NoteActivity, Observer { onReceivePosition(it) })
 
             intent
-                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, New_Note)
+                .getIntExtra(INTENT_EXTRA_NOTE_POSITION, NEW_NOTE)
                 .also(position::postValue)
-                .takeUnless { it == New_Note }
+                .takeUnless { it == NEW_NOTE }
                 ?.also { isNewNode.postValue(false) }
 
         }
-    }
-
-    private fun NoteViewModel.onReceivePosition(it: Int?) {
-        if (it == New_Note)
-            note.postValue(null)
-        else
-            retrieveNoteByPosition()
     }
 
 
@@ -85,12 +78,7 @@ class NoteActivity : AppCompatActivity() {
             ?.also { spinner_courses.setSelection(it) }
 
         if (model.originalValue.value.isNullOrEmpty()) {
-            arrayListOf(
-                note.noteTitle,
-                note.note,
-                note.course.courseId
-
-            ).also { model.originalValue.postValue(it) }
+            model.storeOriginalState()
 
         }
     }
@@ -109,6 +97,21 @@ class NoteActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+
+        menu?.findItem(R.id.action_next)
+            ?.apply {
+                val hasNext = model.hasNext()
+                isVisible = hasNext
+                isEnabled = hasNext
+
+            }
+
+
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -123,8 +126,22 @@ class NoteActivity : AppCompatActivity() {
                 finish()
                 true
             }
+            R.id.action_next -> moveNext()
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun moveNext(): Boolean {
+        saveNote()
+        with(model) {
+            position.postValue(position.value?.inc() ?: NEW_NOTE)
+            storeOriginalState()
+
+        }
+
+        invalidateOptionsMenu()
+
+        return true
     }
 
     private fun sendToMail() {
@@ -203,15 +220,30 @@ class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
     val note: MutableLiveData<Note?> = MutableLiveData(),
     val originalValue: MutableLiveData<ArrayList<String>> = arrayListOf<String>().toMutableLiveData(),
-    val position: MutableLiveData<Int> = New_Note.toMutableLiveData(),
+    val position: MutableLiveData<Int> = NEW_NOTE.toMutableLiveData(),
     val isNewNode: MutableLiveData<Boolean> = true.toMutableLiveData(),
     val isCancelling: MutableLiveData<Boolean> = false.toMutableLiveData(),
-
     val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
     val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(position, note),
     val retrieveCourseById: RetrieveCourseById = RetrieveCourseById(),
     val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position),
     val removeNoteByPosition: RemoveNoteByPosition = RemoveNoteByPosition(position)
+
 ) : ViewModel() {
     fun getCourse(courseId: String): Course = retrieveCourseById(courseId)
+
+    fun onReceivePosition(it: Int?) = if (it == NEW_NOTE) note.postValue(null) else retrieveNoteByPosition()
+
+    fun hasNext(): Boolean = hasNext(position)
+    fun storeOriginalState() {
+        note.value?.apply {
+            arrayListOf(
+                noteTitle,
+                note,
+                course.courseId
+
+            ).also { originalValue.postValue(it) }
+        }
+    }
+
 }

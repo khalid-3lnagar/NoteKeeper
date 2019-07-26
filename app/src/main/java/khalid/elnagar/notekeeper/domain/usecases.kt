@@ -55,7 +55,7 @@ class RetrieveNoteByPosition(
     operator fun invoke() {
         notesRepo
             .retrieveNotes()
-            .let { it.getOrNull(position.value ?: New_Note) }
+            .let { it.getOrNull(position.value ?: NEW_NOTE) }
             ?.also { result.postValue(it) }
     }
 
@@ -67,7 +67,7 @@ class SaveNoteByPosition(
 ) {
     operator fun invoke(note: Note) {
         notesRepo
-            .saveNote(note, position.value ?: New_Note)
+            .saveNote(note, position.value ?: NEW_NOTE)
             .also { position.postValue(it) }
 
 
@@ -86,4 +86,10 @@ class RemoveNoteByPosition(
     }
 
 }
+
+fun hasNext(position: LiveData<Int>, notesRepo: NotesRepository = NotesRepository()) =
+    when (val currentPosition = position.value ?: NEW_NOTE) {
+        NEW_NOTE -> false
+        else -> currentPosition < notesRepo.retrieveNotes().size - 1
+    }
 //endregion
