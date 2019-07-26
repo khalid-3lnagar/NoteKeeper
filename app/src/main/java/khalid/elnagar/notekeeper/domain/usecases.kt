@@ -87,9 +87,24 @@ class RemoveNoteByPosition(
 
 }
 
-fun hasNext(position: LiveData<Int>, notesRepo: NotesRepository = NotesRepository()) =
-    when (val currentPosition = position.value ?: NEW_NOTE) {
-        NEW_NOTE -> false
-        else -> currentPosition < notesRepo.retrieveNotes().size - 1
+class IsNoteHasNext(private val position: LiveData<Int>, private val notesRepo: NotesRepository = NotesRepository()) {
+    operator fun invoke() =
+        when (val currentPosition = position.value ?: NEW_NOTE) {
+            NEW_NOTE -> false
+            else -> currentPosition < notesRepo.retrieveNotes().size - 1
+        }
+}
+
+
+class StoreOriginalStateUseCase(
+    private val note: LiveData<Note?>,
+    private val originalValue: MutableLiveData<ArrayList<String>>
+) {
+    operator fun invoke() {
+        note.value
+            ?.apply {
+                arrayListOf(noteTitle, this.note, course.courseId).also { originalValue.postValue(it) }
+            }
     }
+}
 //endregion

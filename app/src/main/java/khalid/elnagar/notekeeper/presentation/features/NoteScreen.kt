@@ -1,5 +1,6 @@
 package khalid.elnagar.notekeeper.presentation.features
 
+
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
@@ -18,13 +19,17 @@ import khalid.elnagar.notekeeper.entities.Note
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_main.*
 
-const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.entities.Note"
-private const val SAVED_INSTANCE_ORIGINAL_NOTE = "khalid.elnagar.notekeeper.FIRST_CREATION"
 private const val NOTE_TITLE_INDEX = 0
 
 private const val NOTE_TITLE = 1
 
 private const val COURSE_ID_INDEX = 2
+
+//region View
+
+const val INTENT_EXTRA_NOTE_POSITION = "khalid.elnagar.notekeeper.entities.Note"
+
+private const val SAVED_INSTANCE_ORIGINAL_NOTE = "khalid.elnagar.notekeeper.FIRST_CREATION"
 
 class NoteActivity : AppCompatActivity() {
 
@@ -101,7 +106,7 @@ class NoteActivity : AppCompatActivity() {
 
         menu?.findItem(R.id.action_next)
             ?.apply {
-                val hasNext = model.hasNext()
+                val hasNext = model.isNoteHasNext()
                 isVisible = hasNext
                 isEnabled = hasNext
 
@@ -165,35 +170,10 @@ class NoteActivity : AppCompatActivity() {
     override fun onPause() {
         Log.d(TAG, "onPause")
         super.onPause()
-        if (model.isCancelling.value == true) {
-            Log.d(TAG, "onPause: cancelling")
-
-            if (model.isNewNode.value != false) {
-                Log.d(TAG, "onPause: cancelling: removing New Note")
-                model.removeNoteByPosition()
-            } else {
-                Log.d(TAG, "onPause: cancelling: restore Original Note")
-                restorePreviousNoteValue()
-            }
-        } else {
+        if (model.isCancelling.value == true)
+            model.cancelSavingNote()
+        else
             saveNote()
-        }
-
-
-    }
-
-
-    private fun restorePreviousNoteValue() {
-
-        if (!model.originalValue.value.isNullOrEmpty()) {
-            Note(
-                model.originalValue.value!![NOTE_TITLE_INDEX],
-                model.originalValue.value!![NOTE_TITLE],
-                model.getCourse(model.originalValue.value!![COURSE_ID_INDEX])
-
-            ).also { model.saveNoteByPosition(it) }
-        } else
-            Log.d(TAG, "Error while restore Previous Value")
 
     }
 
@@ -216,6 +196,10 @@ class NoteActivity : AppCompatActivity() {
     }
 }
 
+
+//endregion
+
+//region View Model
 class NoteViewModel(
     val courses: CoursesLiveData = listOf<Course>().toMutableLiveData(),
     val note: MutableLiveData<Note?> = MutableLiveData(),
@@ -223,27 +207,46 @@ class NoteViewModel(
     val position: MutableLiveData<Int> = NEW_NOTE.toMutableLiveData(),
     val isNewNode: MutableLiveData<Boolean> = true.toMutableLiveData(),
     val isCancelling: MutableLiveData<Boolean> = false.toMutableLiveData(),
+    val isNoteHasNext: IsNoteHasNext = IsNoteHasNext(position),
     val retrieveAllCourses: RetrieveAllCourses = RetrieveAllCourses(courses),
     val retrieveNoteByPosition: RetrieveNoteByPosition = RetrieveNoteByPosition(position, note),
     val retrieveCourseById: RetrieveCourseById = RetrieveCourseById(),
     val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position),
-    val removeNoteByPosition: RemoveNoteByPosition = RemoveNoteByPosition(position)
+    val removeNoteByPosition: RemoveNoteByPosition = RemoveNoteByPosition(position),
+    val storeOriginalState: StoreOriginalStateUseCase = StoreOriginalStateUseCase(note, originalValue)
 
 ) : ViewModel() {
-    fun getCourse(courseId: String): Course = retrieveCourseById(courseId)
-
     fun onReceivePosition(it: Int?) = if (it == NEW_NOTE) note.postValue(null) else retrieveNoteByPosition()
 
-    fun hasNext(): Boolean = hasNext(position)
-    fun storeOriginalState() {
-        note.value?.apply {
-            arrayListOf(
-                noteTitle,
-                note,
-                course.courseId
+    fun cancelSavingNote() {
 
-            ).also { originalValue.postValue(it) }
+        Log.d(TAG, "cancelSavingNote: cancelling")
+
+        if (isNewNode.value != false) {
+            Log.d(TAG, "cancelSavingNote: cancelling: removing New Note")
+            removeNoteByPosition()
+        } else {
+            Log.d(TAG, "cancelSavingNote: cancelling: restore Original Note")
+            restorePreviousNoteValue()
         }
+
     }
 
+    private fun restorePreviousNoteValue() {
+
+        if (!originalValue.value.isNullOrEmpty()) {
+            Note(
+                originalValue.value!![NOTE_TITLE_INDEX],
+                originalValue.value!![NOTE_TITLE],
+                getCourse(originalValue.value!![COURSE_ID_INDEX])
+
+            ).also { saveNoteByPosition(it) }
+        } else
+            Log.d(TAG, "Error while restore Previous Value")
+
+    }
+
+    private fun getCourse(courseId: String): Course = retrieveCourseById(courseId)
+
 }
+//endregion
