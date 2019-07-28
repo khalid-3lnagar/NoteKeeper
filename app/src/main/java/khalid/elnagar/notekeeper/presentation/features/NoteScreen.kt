@@ -44,6 +44,8 @@ class NoteActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_note)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         initViewModel()
     }
 
@@ -53,7 +55,7 @@ class NoteActivity : AppCompatActivity() {
             courses.observe(this@NoteActivity, Observer { initSpinner(it!!) })
             retrieveAllCourses()
 
-            note.observe(this@NoteActivity, Observer { it?.also(::editNote) ?: addNote() })
+            note.observe(this@NoteActivity, Observer { it?.also(::editNote) ?: saveNote() })
 
             position.observe(this@NoteActivity, Observer { onReceivePosition(it) })
 
@@ -66,11 +68,6 @@ class NoteActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun addNote() {
-        title = getString(R.string.add_note)
-        saveNote()
-    }
 
     private fun editNote(note: Note) {
 

@@ -6,6 +6,9 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -18,6 +21,7 @@ import khalid.elnagar.notekeeper.domain.NotesLiveData
 import khalid.elnagar.notekeeper.domain.RetrieveAllNotes
 import khalid.elnagar.notekeeper.domain.toMutableLiveData
 import khalid.elnagar.notekeeper.entities.Note
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_note.view.*
@@ -37,16 +41,27 @@ class NoteListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note_list)
+        setContentView(R.layout.activity_main)
+
         setSupportActionBar(toolbar)
+
+        drawer_layout.addNavToggle()
+
         fab.setOnClickListener { startNoteActivity(NEW_NOTE) }
+
         initRecyclerView()
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        model.retrieveAllNotes()
+    private fun DrawerLayout.addNavToggle() {
+
+        ActionBarDrawerToggle(
+            this@NoteListActivity, this,
+            toolbar, R.string.open_nav_drawer, R.string.close_nav_drawer
+        )
+            .also(::setDrawerListener)
+            .apply { syncState() }
+
     }
 
     private fun initRecyclerView() {
@@ -60,12 +75,24 @@ class NoteListActivity : AppCompatActivity() {
         }
     }
 
-
     private fun startNoteActivity(position: Int) {
         Intent(this, NoteActivity::class.java)
             .apply { position.also { putExtra(INTENT_EXTRA_NOTE_POSITION, it) } }
             .also(::startActivity)
     }
+
+    override fun onResume() {
+        super.onResume()
+        model.retrieveAllNotes()
+    }
+
+    override fun onBackPressed() = with(drawer_layout) {
+        if (isDrawerOpen(GravityCompat.START))
+            closeDrawer(GravityCompat.START)
+        else
+            super.onBackPressed()
+    }
+
 
 }
 
