@@ -7,7 +7,7 @@
 		android:layout_height="match_parent"
 		app:layout_behavior="@string/appbar_scrolling_view_behavior"
 		tools:showIn="@layout/activity_note_list"
-		tools:context=".presentation.features.NoteListActivity">
+		tools:context=".presentation.features.MainActivity">
 
 	<android.support.v7.widget.RecyclerView
 			android:layout_width="0dp"
@@ -16,5 +16,5 @@
 			app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
 			app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginTop="8dp"
 			app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
-			app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/rv_list_notes"/>
+			app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/rv_list_items"/>
 </android.support.constraint.ConstraintLayout>

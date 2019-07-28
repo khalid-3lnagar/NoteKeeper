@@ -15,7 +15,7 @@ import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.InMemoryDataGetWay
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
-import khalid.elnagar.notekeeper.presentation.features.NoteListActivity
+import khalid.elnagar.notekeeper.presentation.features.MainActivity
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Rule
@@ -28,12 +28,12 @@ class NoteCreationTest {
 
     @Rule
     @JvmField
-    var noteListActivityRule = ActivityTestRule(NoteListActivity::class.java)
+    var noteListActivityRule = ActivityTestRule(MainActivity::class.java)
 
     @Test
     fun createNewNote() {
         //Arrange
-        val dataGetWay = InMemoryDataGetWay.instance
+        val dataGetWay = InMemoryDataGetWay
         val course = dataGetWay.getCourse("java_lang")
         val noteTitle = "hey that is Test Note Title"
         val noteBody = "this is body of our Note Test "
