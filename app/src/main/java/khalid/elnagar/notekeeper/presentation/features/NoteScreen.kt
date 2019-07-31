@@ -17,7 +17,7 @@ import khalid.elnagar.notekeeper.domain.*
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
 import kotlinx.android.synthetic.main.activity_note.*
-import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.content_note.*
 
 private const val NOTE_TITLE_INDEX = 0
 
@@ -73,7 +73,7 @@ class NoteActivity : AppCompatActivity() {
 
         title = getString(R.string.edit_note)
 
-        txtNoteTitle.setText(note.noteTitle)
+        txt_note_title.setText(note.noteTitle)
         txt_note_body.setText(note.note)
         model.courses.value
             ?.indexOf(note.course)
@@ -147,7 +147,7 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun sendToMail() {
-        val subject = txtNoteTitle.text.toString()
+        val subject = txt_note_title.text.toString()
         val course = spinner_courses.selectedItem as Course
         val text = "checkout what I learned in the pluralsight course \"${course.title}\"\n ${txt_note_body.text}"
 
@@ -178,7 +178,7 @@ class NoteActivity : AppCompatActivity() {
     private fun saveNote() {
         Log.d(TAG, "save Note at ${model.position.value}")
         Note(
-            txtNoteTitle.text.toString(),
+            txt_note_title.text.toString(),
             txt_note_body.text.toString(),
             spinner_courses.selectedItem as Course
 

@@ -1,4 +1,4 @@
-package khalid.elnagar.notekeeper.presentation.features.note_screen
+package khalid.elnagar.notekeeper.presentation.features
 
 
 import android.support.test.espresso.Espresso
@@ -15,7 +15,6 @@ import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.InMemoryDataGetWay
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
-import khalid.elnagar.notekeeper.presentation.features.MainActivity
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Rule
@@ -49,7 +48,7 @@ class NoteCreationTest {
 
         spinnerCourses.check(matches(ViewMatchers.withSpinnerText(course.title)))
 
-        onView(withId(R.id.txtNoteTitle))
+        onView(withId(R.id.txt_note_title))
             .perform(typeText(noteTitle))
             .check(matches(withText(noteTitle)))
 
