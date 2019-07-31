@@ -34,10 +34,10 @@ class MainActivity : AppCompatActivity() {
     private val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }
 
     private val notesLayoutManager by lazy { LinearLayoutManager(this@MainActivity) }
-
+    private val onNoteClicked = { notePosition: Int -> startNoteActivity(notePosition) }
     private val notesAdapter by lazy {
         model.retrieveAllNotes()
-        NotesAdapter(model.notes, this@MainActivity, onItemClicked)
+        NotesAdapter(model.notes, this@MainActivity, onNoteClicked)
     }
 
     private val coursesLayoutManager by lazy { GridLayoutManager(this@MainActivity, 2) }
@@ -47,14 +47,6 @@ class MainActivity : AppCompatActivity() {
         CoursesAdapter(model.courses, this@MainActivity)
     }
 
-    private val onItemClicked by lazy {
-        object : NotesAdapter.OnItemClicked {
-            override fun onClick(position: Int) {
-                startNoteActivity(position)
-            }
-
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,42 +145,31 @@ class NotesViewModel(
 class NotesAdapter(
     private val notes: NotesLiveData,
     lifecycleOwner: LifecycleOwner,
-    private val onItemClicked: OnItemClicked
+    private val onItemClicked: (position: Int) -> Unit
 ) :
     RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
     init {
         notes.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
     }
 
-    interface OnItemClicked {
-        fun onClick(position: Int)
-    }
-
     override fun onCreateViewHolder(viewGroup: ViewGroup, position: Int): NoteViewHolder =
         LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.item_note, viewGroup, false)
-            .let { NoteViewHolder(it, onItemClicked) }
+            .let { NoteViewHolder(it) }
 
 
     override fun getItemCount(): Int = notes.value?.size ?: 0
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-
-        holder.bind(notes.value!![position], position)
-    }
-
-    class NoteViewHolder(private val view: View, private val onItemClicked: OnItemClicked) :
-        RecyclerView.ViewHolder(view) {
-
-
-        fun bind(note: Note, position: Int) {
-            with(view) {
-                txt_note.text = note.noteTitle
-                txt_note_course.text = note.course.title
-                note_item.setOnClickListener { onItemClicked.onClick(position) }
-            }
+        val note = notes.value!![position]
+        with(holder.itemView) {
+            txt_note.text = note.noteTitle
+            txt_note_course.text = note.course.title
+            note_item.setOnClickListener { onItemClicked(position) }
         }
     }
+
+    inner class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }
 
 //endregion
@@ -211,21 +192,14 @@ class CoursesAdapter(
     override fun getItemCount(): Int = courses.value?.size ?: 0
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
-
-        holder.bind(courses.value!![position])
-    }
-
-    class CourseViewHolder(private val view: View) :
-        RecyclerView.ViewHolder(view) {
-
-
-        fun bind(course: Course) {
-            with(view) {
-                txt_note_course.text = course.title
-                course_item.setOnClickListener { Snackbar.make(it, "$course", Snackbar.LENGTH_SHORT).show() }
-            }
+        val course = courses.value!![position]
+        with(holder.itemView) {
+            txt_note_course.text = course.title
+            course_item.setOnClickListener { Snackbar.make(it, "$course", Snackbar.LENGTH_SHORT).show() }
         }
     }
+
+    inner class CourseViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }
 //endregion
 
