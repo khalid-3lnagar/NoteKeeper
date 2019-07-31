@@ -4,8 +4,8 @@
 	<group
 			android:checkableBehavior="single">
 		<item android:id="@+id/nav_notes" android:title="@string/notes"
-		      android:icon="@android:drawable/ic_menu_agenda"/>
+		      android:icon="@drawable/ic_assignment_black_24dp"/>
 		<item android:id="@+id/nav_courses" android:title="@string/courses"
-		      android:icon="@android:drawable/ic_menu_slideshow"/>
+		      android:icon="@drawable/ic_slideshow_black_24dp"/>
 	</group>
 </menu>
