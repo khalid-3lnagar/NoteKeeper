@@ -1,6 +1,6 @@
 package khalid.elnagar.notekeeper.domain
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import khalid.elnagar.notekeeper.entities.Note
 import org.junit.Assert
 import org.junit.Before

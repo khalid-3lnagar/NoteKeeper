@@ -1,7 +1,7 @@
 package khalid.elnagar.notekeeper.domain
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 
 import khalid.elnagar.notekeeper.entities.Note
 import org.junit.Assert.assertNotNull

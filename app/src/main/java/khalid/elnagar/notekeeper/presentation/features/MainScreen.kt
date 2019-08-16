@@ -1,23 +1,18 @@
 package khalid.elnagar.notekeeper.presentation.features
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.*
 import khalid.elnagar.notekeeper.entities.Course
@@ -33,14 +28,14 @@ import kotlinx.android.synthetic.main.item_note.view.txt_note_course
 class MainActivity : AppCompatActivity() {
     private val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }
 
-    private val notesLayoutManager by lazy { LinearLayoutManager(this@MainActivity) }
+    private val notesLayoutManager by lazy { androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity) }
     private val onNoteClicked = { notePosition: Int -> startNoteActivity(notePosition) }
     private val notesAdapter by lazy {
         model.retrieveAllNotes()
         NotesAdapter(model.notes, this@MainActivity, onNoteClicked)
     }
 
-    private val coursesLayoutManager by lazy { GridLayoutManager(this@MainActivity, 2) }
+    private val coursesLayoutManager by lazy { androidx.recyclerview.widget.GridLayoutManager(this@MainActivity, 2) }
 
     private val coursesAdapter by lazy {
         model.retrieveAllCourses()
@@ -62,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun DrawerLayout.addNavToggle() {
+    private fun androidx.drawerlayout.widget.DrawerLayout.addNavToggle() {
 
         ActionBarDrawerToggle(
             this@MainActivity, this,
@@ -85,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun DrawerLayout.close() = closeDrawer(GravityCompat.START)
+    private fun androidx.drawerlayout.widget.DrawerLayout.close() = closeDrawer(GravityCompat.START)
 
     private fun displayNotes() {
 
@@ -147,7 +142,7 @@ class NotesAdapter(
     lifecycleOwner: LifecycleOwner,
     private val onItemClicked: (position: Int) -> Unit
 ) :
-    RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
     init {
         notes.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
     }
@@ -169,7 +164,7 @@ class NotesAdapter(
         }
     }
 
-    inner class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    inner class NoteViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 }
 
 //endregion
@@ -178,7 +173,7 @@ class NotesAdapter(
 class CoursesAdapter(
     private val courses: CoursesLiveData, lifecycleOwner: LifecycleOwner
 ) :
-    RecyclerView.Adapter<CoursesAdapter.CourseViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<CoursesAdapter.CourseViewHolder>() {
     init {
         courses.observe(lifecycleOwner, Observer { notifyDataSetChanged() })
     }
@@ -195,11 +190,17 @@ class CoursesAdapter(
         val course = courses.value!![position]
         with(holder.itemView) {
             txt_note_course.text = course.title
-            course_item.setOnClickListener { Snackbar.make(it, "$course", Snackbar.LENGTH_SHORT).show() }
+            course_item.setOnClickListener {
+                com.google.android.material.snackbar.Snackbar.make(
+                    it,
+                    "$course",
+                    com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-    inner class CourseViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    inner class CourseViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 }
 //endregion
 
