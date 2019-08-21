@@ -11,4 +11,20 @@
 	<string name="open_nav_drawer">Open navigation drawer</string>
 	<string name="notes">Notes</string>
 	<string name="courses">Courses</string>
+
+	<string name="settings">Settings</string>
+
+	<!-- Preference Titles -->
+	<string name="general_header">General</string>
+	<string name="data_header">Data</string>
+
+	<!-- General Preferences -->
+	<string name="account_settings_title">Account Settings</string>
+	<string name="account_settings_summary">Edit account settings</string>
+	<string name="account_settings_key" translatable="false">key_account_settings</string>
+
+	<!--Data preference-->
+	<string name="storage_title">Default Storage</string>
+	<string name="storage_default">My Notes</string>
+	<string name="storage_key" translatable="false">key_storage</string>
 </resources>

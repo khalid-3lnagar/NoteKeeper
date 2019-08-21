@@ -2,13 +2,11 @@ package khalid.elnagar.notekeeper.presentation.features
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -23,6 +21,8 @@ import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_course.view.*
 import kotlinx.android.synthetic.main.item_note.view.*
 import kotlinx.android.synthetic.main.item_note.view.txt_note_course
+
+const val FRAGMENT_SETTINGS = "fragment_settings"
 
 //region View
 class MainActivity : AppCompatActivity() {
@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         CoursesAdapter(model.courses, this@MainActivity)
     }
 
+    private val settingsFragment by lazy { SettingsFragment() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun androidx.drawerlayout.widget.DrawerLayout.addNavToggle() {
+    private fun DrawerLayout.addNavToggle() {
 
         ActionBarDrawerToggle(
             this@MainActivity, this,
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun androidx.drawerlayout.widget.DrawerLayout.close() = closeDrawer(GravityCompat.START)
+    private fun DrawerLayout.close() = closeDrawer(GravityCompat.START)
 
     private fun displayNotes() {
 
@@ -116,6 +117,22 @@ class MainActivity : AppCompatActivity() {
             close()
         else
             super.onBackPressed()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+
+            R.id.action_settings -> Intent(this, SettingsActivity::class.java).also(::startActivity)
+
+
+        }
+        return super.onOptionsItemSelected(item)
+
     }
 
 }

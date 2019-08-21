@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory android:title="@string/general_header">
+		<Preference
+				android:icon="@drawable/ic_acc_settings"
+				android:key="@string/account_settings_key"
+				android:selectable="true"
+				android:summary="@string/account_settings_summary"
+				android:title="@string/account_settings_title" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/data_header">
+		<EditTextPreference
+
+				android:defaultValue="@string/storage_default"
+				android:key="@string/storage_key"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:summary="@string/storage_default"
+				android:title="@string/storage_title" />
+	</PreferenceCategory>
+</PreferenceScreen>

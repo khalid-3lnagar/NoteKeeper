@@ -186,10 +186,11 @@ class NoteActivity : AppCompatActivity() {
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         Log.d(TAG, "onSaveInstanceState: saving note original value")
-        outState?.putStringArrayList(SAVED_INSTANCE_ORIGINAL_NOTE, model.originalValue.value)
+        outState.putStringArrayList(SAVED_INSTANCE_ORIGINAL_NOTE, model.originalValue.value)
     }
 }
 
