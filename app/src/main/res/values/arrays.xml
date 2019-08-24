@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="pref_favorite_social_entries">
+
+		<item>Facebook</item>
+		<item>Twitter</item>
+	</string-array>
+	<string-array name="pref_favorite_social_values">
+
+		<item>https://fb.com</item>
+		<item>https://twitter.com</item>
+	</string-array>
+</resources>

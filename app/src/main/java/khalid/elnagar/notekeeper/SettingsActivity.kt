@@ -1,2 +1,0 @@
-package khalid.elnagar.notekeeper
-

@@ -35,14 +35,18 @@ class MainActivity : AppCompatActivity() {
         NotesAdapter(model.notes, this@MainActivity, onNoteClicked)
     }
 
-    private val coursesLayoutManager by lazy { androidx.recyclerview.widget.GridLayoutManager(this@MainActivity, 2) }
+    private val coursesLayoutManager by lazy {
+        androidx.recyclerview.widget.GridLayoutManager(
+            this@MainActivity,
+            2
+        )
+    }
 
     private val coursesAdapter by lazy {
         model.retrieveAllCourses()
         CoursesAdapter(model.courses, this@MainActivity)
     }
 
-    private val settingsFragment by lazy { SettingsFragment() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,9 +129,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
         when (item?.itemId) {
 
-            R.id.action_settings -> Intent(this, SettingsActivity::class.java).also(::startActivity)
+            R.id.action_settings ->
+                Intent(this, SettingsActivity::class.java).also(::startActivity)
 
 
         }
@@ -181,7 +187,8 @@ class NotesAdapter(
         }
     }
 
-    inner class NoteViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
+    inner class NoteViewHolder(view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 }
 
 //endregion
@@ -217,7 +224,8 @@ class CoursesAdapter(
         }
     }
 
-    inner class CourseViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
+    inner class CourseViewHolder(view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 }
 //endregion
 
