@@ -2,6 +2,7 @@ package khalid.elnagar.notekeeper.presentation.features
 
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,12 +16,14 @@ import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.*
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
+import khalid.elnagar.notekeeper.presentation.core.get
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.content_note_list.*
 import kotlinx.android.synthetic.main.item_course.view.*
 import kotlinx.android.synthetic.main.item_note.view.*
 import kotlinx.android.synthetic.main.item_note.view.txt_note_course
+import kotlinx.android.synthetic.main.nav_header.view.*
 
 const val FRAGMENT_SETTINGS = "fragment_settings"
 
@@ -78,12 +81,16 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.nav_notes -> displayNotes()
             R.id.nav_courses -> displayCourses()
-
+            R.id.nav_settings -> startSettings()
         }
         drawer_layout.close()
 
         return true
     }
+
+    private fun startSettings() =
+        Intent(this, SettingsActivity::class.java).let(::startActivity)
+
 
     private fun DrawerLayout.close() = closeDrawer(GravityCompat.START)
 
@@ -114,6 +121,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         model.retrieveAllNotes()
+        updateNavHeader()
+    }
+
+    private fun updateNavHeader() {
+        val pref = getDefaultSharedPreferences(this)
+        val header: View = nav_view.getHeaderView(0)
+        header.nav_txt_name.text =
+            pref[getString(R.string.display_name_key), getString(R.string.display_name_default)]
+        header.nav_txt_email.text =
+            pref[getString(R.string.email_address_key), getString(R.string.email_address_default)]
+
     }
 
     override fun onBackPressed() = with(drawer_layout) {
@@ -130,13 +148,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 
-        when (item?.itemId) {
+        if (item?.itemId == R.id.action_settings)
+            startSettings()
 
-            R.id.action_settings ->
-                Intent(this, SettingsActivity::class.java).also(::startActivity)
-
-
-        }
         return super.onOptionsItemSelected(item)
 
     }

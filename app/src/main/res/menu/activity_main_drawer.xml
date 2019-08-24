@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<group
-			android:checkableBehavior="single">
-		<item android:id="@+id/nav_notes" android:title="@string/notes"
-		      android:icon="@drawable/ic_assignment_black_24dp"/>
-		<item android:id="@+id/nav_courses" android:title="@string/courses"
-		      android:icon="@drawable/ic_slideshow_black_24dp"/>
+	<group android:checkableBehavior="single">
+		<item
+				android:id="@+id/nav_notes"
+				android:icon="@drawable/ic_assignment_black_24dp"
+				android:title="@string/notes" />
+		<item
+				android:id="@+id/nav_courses"
+				android:icon="@drawable/ic_slideshow_black_24dp"
+				android:title="@string/courses" />
+
 	</group>
+	<item
+			android:id="@+id/nav_settings"
+			android:icon="@drawable/ic_settings_black_24dp"
+			android:title="@string/settings" />
 </menu>

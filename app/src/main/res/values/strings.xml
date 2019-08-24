@@ -39,6 +39,7 @@
 	<string name="favorite_social_key" translatable="false">favorite_social_key</string>
 	<string name="favorite_social_title">Favorite social network</string>
 	<string name="favorite_social_default">https://fb.com</string>
+	<string name="profile_picture">Profile picture</string>
 
 
 </resources>
