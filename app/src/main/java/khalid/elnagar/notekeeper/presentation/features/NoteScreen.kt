@@ -16,6 +16,7 @@ import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.*
 import khalid.elnagar.notekeeper.entities.Course
 import khalid.elnagar.notekeeper.entities.Note
+import khalid.elnagar.notekeeper.presentation.sub_feautres.notifications.NoteReminder
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_note.*
 
@@ -128,12 +129,23 @@ class NoteActivity : AppCompatActivity() {
                 finish()
                 true
             }
-            R.id.action_next -> moveNext()
+            R.id.action_next -> {
+                moveNext()
+                true
+            }
+            R.id.action_reminder -> {
+                showNoteReminderNotification()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun moveNext(): Boolean {
+    private fun showNoteReminderNotification() {
+        NoteReminder.notify(this, txt_note_body.text.toString(), txt_note_title.text.toString())
+    }
+
+    private fun moveNext() {
         saveNote()
         with(model) {
             position.postValue(position.value?.inc() ?: NEW_NOTE)
@@ -143,13 +155,13 @@ class NoteActivity : AppCompatActivity() {
 
         invalidateOptionsMenu()
 
-        return true
     }
 
     private fun sendToMail() {
         val subject = txt_note_title.text.toString()
         val course = spinner_courses.selectedItem as Course
-        val text = "checkout what I learned in the pluralsight course \"${course.title}\"\n ${txt_note_body.text}"
+        val text =
+            "checkout what I learned in the pluralsight course \"${course.title}\"\n ${txt_note_body.text}"
 
 
         Intent(Intent.ACTION_SEND)
@@ -211,10 +223,14 @@ class NoteViewModel(
     val retrieveCourseById: RetrieveCourseById = RetrieveCourseById(),
     val saveNoteByPosition: SaveNoteByPosition = SaveNoteByPosition(position),
     val removeNoteByPosition: RemoveNoteByPosition = RemoveNoteByPosition(position),
-    val storeOriginalState: StoreOriginalStateUseCase = StoreOriginalStateUseCase(note, originalValue)
+    val storeOriginalState: StoreOriginalStateUseCase = StoreOriginalStateUseCase(
+        note,
+        originalValue
+    )
 
 ) : ViewModel() {
-    fun onReceivePosition(it: Int?) = if (it == NEW_NOTE) note.postValue(null) else retrieveNoteByPosition()
+    fun onReceivePosition(it: Int?) =
+        if (it == NEW_NOTE) note.postValue(null) else retrieveNoteByPosition()
 
     fun cancelSavingNote() {
 

@@ -41,5 +41,8 @@
 	<string name="favorite_social_default">https://fb.com</string>
 	<string name="profile_picture">Profile picture</string>
 
+	<string name="action_reminde">Reminde me</string>
+	<string name="review_note">Review note</string>
+
 
 </resources>

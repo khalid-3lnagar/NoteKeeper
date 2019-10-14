@@ -25,8 +25,6 @@ import kotlinx.android.synthetic.main.item_note.view.*
 import kotlinx.android.synthetic.main.item_note.view.txt_note_course
 import kotlinx.android.synthetic.main.nav_header.view.*
 
-const val FRAGMENT_SETTINGS = "fragment_settings"
-
 //region View
 class MainActivity : AppCompatActivity() {
     private val model by lazy { ViewModelProviders.of(this).get(NotesViewModel::class.java) }

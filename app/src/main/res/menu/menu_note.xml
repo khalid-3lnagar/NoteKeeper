@@ -10,4 +10,9 @@
 	      android:title="@string/action_send_mail"
 	      android:orderInCategory="102"
 	      app:showAsAction="never"/>
+	<item
+			android:id="@+id/action_reminder"
+			android:orderInCategory="103"
+			android:title="@string/action_reminde"
+			app:showAsAction="never" />
 </menu>
