@@ -12,6 +12,8 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import khalid.elnagar.notekeeper.R
 import khalid.elnagar.notekeeper.domain.InMemoryDataGetWay
+import khalid.elnagar.notekeeper.presentation.features.main_screen.MainActivity
+import khalid.elnagar.notekeeper.presentation.features.main_screen.NotesAdapter
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
